@@ -1,5 +1,6 @@
 package com.hms.hospital.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -18,17 +19,26 @@ public class HospitalPatient {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, length = 40)
+    private String patientCode;
+
     @Column(nullable = false, length = 120)
     private String name;
 
     @Column(nullable = false, length = 12)
     private String gender;
 
+    @Column
+    private LocalDate dob;
+
     @Column(nullable = false)
     private Integer age;
 
     @Column(length = 20)
     private String phone;
+
+    @Column(length = 500)
+    private String address;
 
     @Column(length = 10)
     private String bloodGroup;
@@ -51,6 +61,14 @@ public class HospitalPatient {
         this.id = id;
     }
 
+    public String getPatientCode() {
+        return patientCode;
+    }
+
+    public void setPatientCode(String patientCode) {
+        this.patientCode = patientCode;
+    }
+
     public String getName() {
         return name;
     }
@@ -67,6 +85,14 @@ public class HospitalPatient {
         this.gender = gender;
     }
 
+    public LocalDate getDob() {
+        return dob;
+    }
+
+    public void setDob(LocalDate dob) {
+        this.dob = dob;
+    }
+
     public Integer getAge() {
         return age;
     }
@@ -81,6 +107,14 @@ public class HospitalPatient {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getBloodGroup() {

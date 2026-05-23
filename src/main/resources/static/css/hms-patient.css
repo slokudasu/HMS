@@ -1,0 +1,86 @@
+.hms-form-section {
+    background: #ffffff;
+    border: 1px solid #dbe2ea;
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 12px;
+}
+
+.hms-form-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.hms-muted-label {
+    color: #64748b;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.hms-data-value {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.hms-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 10px;
+}
+
+.hms-summary-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+.hms-pill {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.hms-pill-opd {
+    color: #0f4c81;
+    background: #deedf9;
+}
+
+.hms-pill-ipd {
+    color: #7a2e0d;
+    background: #fbe7dd;
+}
+
+.hms-pill-done {
+    color: #20673d;
+    background: #dcfce7;
+}
+
+.hms-pill-pending {
+    color: #7a5d00;
+    background: #fef3c7;
+}
+
+.hms-pill-critical {
+    color: #9b1c1c;
+    background: #fee2e2;
+}
+
+.hms-table-wrap {
+    overflow-x: auto;
+}
+
+.hms-table-wrap table {
+    min-width: 860px;
+}
+
+.hms-empty-row td {
+    color: #64748b;
+    text-align: center;
+}

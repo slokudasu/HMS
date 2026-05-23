@@ -1,5 +1,15 @@
     </main>
 </div>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap5.bundle.min.js"></script>
+<%
+String hmsExtraJs = (String) request.getAttribute("hmsExtraJs");
+if (hmsExtraJs != null && !hmsExtraJs.trim().isEmpty()) {
+%>
+<script src="<%= org.springframework.web.util.HtmlUtils.htmlEscape(hmsExtraJs) %>"></script>
+<%
+}
+%>
 <script src="/js/hms-shell.js"></script>
 </body>
 </html>

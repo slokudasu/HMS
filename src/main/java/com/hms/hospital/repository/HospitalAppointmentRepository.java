@@ -14,4 +14,6 @@ public interface HospitalAppointmentRepository extends JpaRepository<HospitalApp
     long countByStatus(String status);
 
     long countByAppointmentDateTimeBetween(LocalDateTime startInclusive, LocalDateTime endExclusive);
+
+    long countByPatientId(Long patientId);
 }

@@ -3,10 +3,12 @@ package com.hms.hospital.controller;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,12 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -35,6 +39,7 @@ import com.hms.hospital.repository.HospitalPatientRepository;
 public class HospitalRestController {
 
     private static final DateTimeFormatter INPUT_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+    private static final DateTimeFormatter INPUT_DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
     private static final Set<String> VALID_STATUSES = Set.of(
             HospitalAppointment.STATUS_SCHEDULED,
             HospitalAppointment.STATUS_COMPLETED,
@@ -83,25 +88,37 @@ public class HospitalRestController {
 
     @GetMapping("/patients")
     public List<HospitalPatient> patients() {
-        return patientRepository.findAll(Sort.by(Sort.Direction.ASC, "name"));
+        return patientRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
     @PostMapping("/patients")
     public HospitalPatient createPatient(@RequestBody PatientRequest request) {
-        String name = requiredText(request.getName(), "Patient name is required");
-        String gender = normalizeGender(request.getGender());
-        Integer age = request.getAge();
-        if (age == null || age <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Age must be greater than zero");
-        }
-
         HospitalPatient patient = new HospitalPatient();
-        patient.setName(name);
-        patient.setGender(gender);
-        patient.setAge(age);
-        patient.setPhone(trimToNull(request.getPhone()));
-        patient.setBloodGroup(trimToNull(request.getBloodGroup()));
+        applyPatientRequest(patient, request);
         return patientRepository.save(patient);
+    }
+
+    @PutMapping("/patients/{id}")
+    public HospitalPatient updatePatient(@PathVariable Long id, @RequestBody PatientRequest request) {
+        HospitalPatient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found"));
+        applyPatientRequest(patient, request);
+        return patientRepository.save(patient);
+    }
+
+    @DeleteMapping("/patients/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletePatient(@PathVariable Long id) {
+        HospitalPatient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found"));
+
+        long appointmentCount = appointmentRepository.countByPatientId(id);
+        if (appointmentCount > 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Cannot delete patient with existing appointments");
+        }
+        patientRepository.delete(patient);
     }
 
     @GetMapping("/appointments")
@@ -200,6 +217,85 @@ public class HospitalRestController {
         return fee;
     }
 
+    private void applyPatientRequest(HospitalPatient patient, PatientRequest request) {
+        String name = requiredText(request.getName(), "Patient name is required");
+        String gender = normalizeGender(request.getGender());
+        LocalDate dob = parsePatientDob(request.getDob());
+        Integer age = resolveAge(request.getAge(), dob);
+
+        patient.setPatientCode(resolvePatientCode(request.getPatientCode(), patient.getPatientCode(), patient.getId()));
+        patient.setName(name);
+        patient.setGender(gender);
+        patient.setDob(dob);
+        patient.setAge(age);
+        patient.setPhone(trimToNull(firstNonBlank(request.getMobile(), request.getPhone())));
+        patient.setAddress(trimToNull(request.getAddress()));
+        patient.setBloodGroup(trimToNull(request.getBloodGroup()));
+    }
+
+    private LocalDate parsePatientDob(String dob) {
+        if (!StringUtils.hasText(dob)) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(dob.trim(), INPUT_DATE_FORMATTER);
+        } catch (DateTimeParseException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "DOB must be in yyyy-MM-dd format");
+        }
+    }
+
+    private Integer resolveAge(Integer age, LocalDate dob) {
+        if (dob != null) {
+            int calculated = Period.between(dob, LocalDate.now()).getYears();
+            if (calculated < 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "DOB cannot be in the future");
+            }
+            return calculated;
+        }
+
+        if (age == null || age <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Age must be greater than zero");
+        }
+        return age;
+    }
+
+    private String resolvePatientCode(String requestedCode, String existingCode, Long currentPatientId) {
+        String candidate = trimToNull(requestedCode);
+        if (candidate == null) {
+            candidate = trimToNull(existingCode);
+        }
+        if (candidate == null) {
+            candidate = generatePatientCode();
+        }
+
+        String normalized = candidate.toUpperCase();
+        Optional<HospitalPatient> existing = patientRepository.findByPatientCode(normalized);
+        if (existing.isPresent()) {
+            Long existingId = existing.get().getId();
+            if (currentPatientId == null || !currentPatientId.equals(existingId)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Patient code already exists");
+            }
+        }
+        return normalized;
+    }
+
+    private String generatePatientCode() {
+        String prefix = "PAT-" + LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE) + "-";
+        Optional<HospitalPatient> latest = patientRepository.findTopByPatientCodeStartingWithOrderByPatientCodeDesc(prefix);
+        int sequence = 1;
+        if (latest.isPresent() && StringUtils.hasText(latest.get().getPatientCode())) {
+            String currentCode = latest.get().getPatientCode().trim();
+            if (currentCode.startsWith(prefix)) {
+                try {
+                    sequence = Integer.parseInt(currentCode.substring(prefix.length())) + 1;
+                } catch (NumberFormatException ignored) {
+                    sequence = 1;
+                }
+            }
+        }
+        return prefix + String.format("%03d", sequence);
+    }
+
     private String normalizeGender(String gender) {
         String normalized = requiredText(gender, "Gender is required").toUpperCase();
         if (!"MALE".equals(normalized) && !"FEMALE".equals(normalized) && !"OTHER".equals(normalized)) {
@@ -244,6 +340,14 @@ public class HospitalRestController {
             return null;
         }
         return value.trim();
+    }
+
+    private String firstNonBlank(String primary, String fallback) {
+        String value = trimToNull(primary);
+        if (value != null) {
+            return value;
+        }
+        return trimToNull(fallback);
     }
 
     public record DashboardResponse(
@@ -313,11 +417,23 @@ public class HospitalRestController {
     }
 
     public static class PatientRequest {
+        private String patientCode;
         private String name;
         private String gender;
+        private String dob;
         private Integer age;
+        private String mobile;
         private String phone;
+        private String address;
         private String bloodGroup;
+
+        public String getPatientCode() {
+            return patientCode;
+        }
+
+        public void setPatientCode(String patientCode) {
+            this.patientCode = patientCode;
+        }
 
         public String getName() {
             return name;
@@ -335,6 +451,14 @@ public class HospitalRestController {
             this.gender = gender;
         }
 
+        public String getDob() {
+            return dob;
+        }
+
+        public void setDob(String dob) {
+            this.dob = dob;
+        }
+
         public Integer getAge() {
             return age;
         }
@@ -343,12 +467,28 @@ public class HospitalRestController {
             this.age = age;
         }
 
+        public String getMobile() {
+            return mobile;
+        }
+
+        public void setMobile(String mobile) {
+            this.mobile = mobile;
+        }
+
         public String getPhone() {
             return phone;
         }
 
         public void setPhone(String phone) {
             this.phone = phone;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
         }
 
         public String getBloodGroup() {

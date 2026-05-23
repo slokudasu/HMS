@@ -5,6 +5,7 @@ String hmsPageTitle = (String) request.getAttribute("pageTitle");
 if (hmsPageTitle == null || hmsPageTitle.trim().isEmpty()) {
     hmsPageTitle = "Hospital Management System";
 }
+String hmsExtraCss = (String) request.getAttribute("hmsExtraCss");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,6 +15,9 @@ if (hmsPageTitle == null || hmsPageTitle.trim().isEmpty()) {
     <title><%= HtmlUtils.htmlEscape(hmsPageTitle) %></title>
     <link rel="stylesheet" href="/css/bootstrap5.min.css">
     <link rel="stylesheet" href="/css/hms-shell.css">
+    <% if (hmsExtraCss != null && !hmsExtraCss.trim().isEmpty()) { %>
+    <link rel="stylesheet" href="<%= HtmlUtils.htmlEscape(hmsExtraCss) %>">
+    <% } %>
 </head>
 <body class="hms-shell">
 <header class="hms-topbar">
