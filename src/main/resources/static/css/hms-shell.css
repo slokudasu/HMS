@@ -1,0 +1,136 @@
+body.hms-shell {
+    margin: 0;
+    background: #f3f5f9;
+    color: #1f2937;
+    font-size: 14px;
+}
+
+.hms-topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1040;
+    height: 56px;
+    background: #0f4c81;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+}
+
+.hms-brand {
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.hms-topbar .btn {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.45);
+}
+
+.hms-layout {
+    display: flex;
+    min-height: 100vh;
+    padding-top: 56px;
+}
+
+.hms-sidebar {
+    width: 280px;
+    background: #ffffff;
+    border-right: 1px solid #dbe2ea;
+    padding: 12px 10px 24px;
+    position: fixed;
+    top: 56px;
+    bottom: 0;
+    overflow-y: auto;
+}
+
+.hms-nav-section {
+    margin-bottom: 14px;
+}
+
+.hms-nav-title {
+    margin: 10px 8px 6px;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #64748b;
+    font-weight: 700;
+}
+
+.hms-nav-link {
+    display: block;
+    border-radius: 6px;
+    padding: 7px 9px;
+    color: #1f2937;
+    text-decoration: none;
+    line-height: 1.2;
+    margin-bottom: 2px;
+}
+
+.hms-nav-link:hover {
+    background: #eaf2fb;
+    color: #0f4c81;
+}
+
+.hms-main {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+}
+
+.hms-page-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 12px;
+}
+
+.hms-placeholder-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px;
+}
+
+.hms-stat-card {
+    background: #fff;
+    border: 1px solid #dbe2ea;
+    border-radius: 8px;
+    padding: 14px;
+}
+
+.hms-stat-label {
+    font-size: 13px;
+    color: #64748b;
+}
+
+.hms-stat-value {
+    margin-top: 6px;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.hms-section-empty {
+    background: #fbfcfe;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 16px;
+    color: #64748b;
+}
+
+@media (max-width: 991.98px) {
+    .hms-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.2s ease;
+        z-index: 1035;
+    }
+
+    .hms-sidebar.open {
+        transform: translateX(0);
+    }
+
+    .hms-main {
+        margin-left: 0;
+        width: 100%;
+    }
+}
