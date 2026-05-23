@@ -1,0 +1,123 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="org.springframework.web.util.HtmlUtils" %>
+<%
+String hmsPageTitle = (String) request.getAttribute("pageTitle");
+if (hmsPageTitle == null || hmsPageTitle.trim().isEmpty()) {
+    hmsPageTitle = "Hospital Management System";
+}
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= HtmlUtils.htmlEscape(hmsPageTitle) %></title>
+    <link rel="stylesheet" href="/css/bootstrap5.min.css">
+    <link rel="stylesheet" href="/css/hms-shell.css">
+</head>
+<body class="hms-shell">
+<header class="hms-topbar">
+    <div class="d-flex align-items-center gap-2">
+        <button id="hmsSidebarToggle" class="btn btn-sm d-lg-none" type="button">Menu</button>
+        <a href="/hms/dashboard" class="hms-brand">HMS Portal</a>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <a class="btn btn-sm" href="/hms/auth/login">Login</a>
+        <a class="btn btn-sm" href="/hms/auth/logout">Logout</a>
+    </div>
+</header>
+
+<div class="hms-layout">
+    <aside id="hmsSidebar" class="hms-sidebar">
+        <div class="hms-nav-section">
+            <div class="hms-nav-title">Dashboard</div>
+            <a class="hms-nav-link" href="/hms/dashboard">Admin Dashboard</a>
+        </div>
+
+        <div class="hms-nav-section">
+            <div class="hms-nav-title">Authentication</div>
+            <a class="hms-nav-link" href="/hms/auth/login">Login</a>
+            <a class="hms-nav-link" href="/hms/auth/logout">Logout</a>
+            <a class="hms-nav-link" href="/hms/auth/users">User Management</a>
+        </div>
+
+        <div class="hms-nav-section">
+            <div class="hms-nav-title">Master Data</div>
+            <a class="hms-nav-link" href="/hms/master/departments">Department Master</a>
+            <a class="hms-nav-link" href="/hms/master/doctors">Doctor Master</a>
+            <a class="hms-nav-link" href="/hms/master/rooms">Room Master</a>
+            <a class="hms-nav-link" href="/hms/master/beds">Bed Master</a>
+            <a class="hms-nav-link" href="/hms/master/medicines">Medicine Master</a>
+            <a class="hms-nav-link" href="/hms/master/lab-tests">Lab Test Master</a>
+        </div>
+
+        <div class="hms-nav-section">
+            <div class="hms-nav-title">Patient</div>
+            <a class="hms-nav-link" href="/hms/patient/registration">Patient Registration</a>
+            <a class="hms-nav-link" href="/hms/patient/search">Patient Search</a>
+            <a class="hms-nav-link" href="/hms/patient/history">Patient History</a>
+        </div>
+
+        <div class="hms-nav-section">
+            <div class="hms-nav-title">Doctor</div>
+            <a class="hms-nav-link" href="/hms/doctor/registration">Doctor Registration</a>
+            <a class="hms-nav-link" href="/hms/doctor/specializations">Specializations</a>
+            <a class="hms-nav-link" href="/hms/doctor/schedules">Doctor Schedules</a>
+        </div>
+
+        <div class="hms-nav-section">
+            <div class="hms-nav-title">Appointment</div>
+            <a class="hms-nav-link" href="/hms/appointment/book">Book Appointment</a>
+            <a class="hms-nav-link" href="/hms/appointment/cancel">Cancel Appointment</a>
+            <a class="hms-nav-link" href="/hms/appointment/history">Appointment History</a>
+        </div>
+
+        <div class="hms-nav-section">
+            <div class="hms-nav-title">IPD</div>
+            <a class="hms-nav-link" href="/hms/ipd/admission">Admission</a>
+            <a class="hms-nav-link" href="/hms/ipd/bed-allocation">Bed Allocation</a>
+            <a class="hms-nav-link" href="/hms/ipd/room-management">Room Management</a>
+            <a class="hms-nav-link" href="/hms/ipd/discharge">Discharge</a>
+        </div>
+
+        <div class="hms-nav-section">
+            <div class="hms-nav-title">OPD</div>
+            <a class="hms-nav-link" href="/hms/opd/consultation">Consultation</a>
+            <a class="hms-nav-link" href="/hms/opd/prescription">Prescription</a>
+        </div>
+
+        <div class="hms-nav-section">
+            <div class="hms-nav-title">Pharmacy</div>
+            <a class="hms-nav-link" href="/hms/pharmacy/medicine-management">Medicine Management</a>
+            <a class="hms-nav-link" href="/hms/pharmacy/stock-management">Stock Management</a>
+            <a class="hms-nav-link" href="/hms/pharmacy/sales">Sales</a>
+        </div>
+
+        <div class="hms-nav-section">
+            <div class="hms-nav-title">Laboratory</div>
+            <a class="hms-nav-link" href="/hms/laboratory/test-management">Test Management</a>
+            <a class="hms-nav-link" href="/hms/laboratory/test-reports">Test Reports</a>
+        </div>
+
+        <div class="hms-nav-section">
+            <div class="hms-nav-title">Billing</div>
+            <a class="hms-nav-link" href="/hms/billing/consultation-charges">Consultation Charges</a>
+            <a class="hms-nav-link" href="/hms/billing/room-charges">Room Charges</a>
+            <a class="hms-nav-link" href="/hms/billing/lab-charges">Lab Charges</a>
+            <a class="hms-nav-link" href="/hms/billing/pharmacy-charges">Pharmacy Charges</a>
+            <a class="hms-nav-link" href="/hms/billing/final-bill">Final Bill</a>
+        </div>
+
+        <div class="hms-nav-section">
+            <div class="hms-nav-title">Reports</div>
+            <a class="hms-nav-link" href="/hms/reports/patient-list">Patient List</a>
+            <a class="hms-nav-link" href="/hms/reports/admission-report">Admission Report</a>
+            <a class="hms-nav-link" href="/hms/reports/doctor-appointments">Doctor-wise Appointments</a>
+            <a class="hms-nav-link" href="/hms/reports/daily-collection">Daily Collection</a>
+            <a class="hms-nav-link" href="/hms/reports/monthly-revenue">Monthly Revenue</a>
+            <a class="hms-nav-link" href="/hms/reports/stock-summary">Stock Summary</a>
+        </div>
+    </aside>
+
+    <main class="hms-main container-fluid py-3">
+        <h1 class="hms-page-title"><%= HtmlUtils.htmlEscape(hmsPageTitle) %></h1>

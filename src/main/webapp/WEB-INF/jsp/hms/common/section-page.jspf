@@ -1,0 +1,29 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="org.springframework.web.util.HtmlUtils" %>
+<%
+String sectionTitle = (String) request.getAttribute("sectionTitle");
+if (sectionTitle == null || sectionTitle.trim().isEmpty()) {
+    sectionTitle = "Section";
+}
+String sectionDescription = (String) request.getAttribute("sectionDescription");
+if (sectionDescription == null || sectionDescription.trim().isEmpty()) {
+    sectionDescription = "Scaffold page created for this HMS section.";
+}
+%>
+<%@ include file="/WEB-INF/jsp/hms/common/layout-start.jspf" %>
+<div class="card shadow-sm mb-3">
+    <div class="card-header bg-white d-flex align-items-center justify-content-between">
+        <strong><%= HtmlUtils.htmlEscape(sectionTitle) %></strong>
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-primary" type="button">Save</button>
+            <button class="btn btn-sm btn-outline-secondary" type="button">Search</button>
+        </div>
+    </div>
+    <div class="card-body">
+        <p class="text-muted mb-3"><%= HtmlUtils.htmlEscape(sectionDescription) %></p>
+        <div class="hms-section-empty">
+            UI placeholders are ready. Add form fields, validations, API integration, and report logic for this page.
+        </div>
+    </div>
+</div>
+<%@ include file="/WEB-INF/jsp/hms/common/layout-end.jspf" %>
